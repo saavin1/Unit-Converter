@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <!-- Ensures the app scales correctly on mobile devices and prevents zooming -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    
+    <!-- Apple Web App Meta Tags for Full-Screen Native Feel -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Time Converter">
+    
+    <!-- Optional: Replace the href link with a URL to your own 180x180 PNG image for a custom home screen icon -->
+    <link rel="apple-touch-icon" href="https://via.placeholder.com/180x180/007aff/ffffff?text=Time">
+
+    <title>Time Unit Converter</title>
+    <style>
+        :root {
+            --bg-color: #f2f2f7; /* Standard iOS background */
+            --card-bg: #ffffff;
+            --text-main: #1c1c1e;
+            --accent: #007aff; /* iOS blue */
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+            /* Prevents the rubber-band scrolling effect on iOS */
+            overscroll-behavior-y: none;
+        }
+        .container {
+            background: var(--card-bg);
+            padding: 30px 20px;
+            border-radius: 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            width: 100%;
+            max-width: 350px;
+            text-align: center;
+        }
+        h1 {
+            margin-top: 0;
+            font-size: 22px;
+            font-weight: 600;
+            margin-bottom: 25px;
+        }
+        .input-group {
+            margin-bottom: 30px;
+        }
+        label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 10px;
+            color: #8e8e93;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        input[type="number"] {
+            width: 100%;
+            padding: 15px;
+            font-size: 32px;
+            font-weight: 600;
+            border: 2px solid #e5e5ea;
+            border-radius: 12px;
+            box-sizing: border-box;
+            text-align: center;
+            color: var(--text-main);
+            background-color: #fafafa;
+            transition: border-color 0.2s;
+            /* Optimizes the keyboard for numbers on iOS */
+            -webkit-appearance: none;
+        }
+        input[type="number"]:focus {
+            outline: none;
+            border-color: var(--accent);
+            background-color: #ffffff;
+        }
+        .results {
+            background: var(--bg-color);
+            padding: 20px;
+            border-radius: 16px;
+        }
+        .result-item {
+            margin-bottom: 15px;
+        }
+        .result-item:last-child {
+            margin-bottom: 0;
+        }
+        .result-label {
+            font-size: 13px;
+            font-weight: 500;
+            color: #8e8e93;
+            margin-bottom: 5px;
+        }
+        .result-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--accent);
+        }
+        button {
+            margin-top: 25px;
+            background-color: transparent;
+            color: #ff3b30; /* iOS red */
+            border: none;
+            font-size: 17px;
+            font-weight: 500;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        button:active {
+            opacity: 0.7;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Time Converter</h1>
+    
+    <div class="input-group">
+        <label for="units">Time Units</label>
+        <!-- inputmode="decimal" ensures the number pad pops up on iPhone -->
+        <input type="number" id="units" placeholder="0" inputmode="decimal">
+    </div>
+
+    <div class="results">
+        <div class="result-item">
+            <div class="result-label">Hours & Minutes</div>
+            <div class="result-value" id="std-time">0h 0m</div>
+        </div>
+        <div class="result-item">
+            <div class="result-label">Decimal Hours</div>
+            <div class="result-value" id="dec-time">0.00</div>
+        </div>
+    </div>
+
+    <button onclick="resetApp()">Reset</button>
+</div>
+
+<script>
+    const unitInput = document.getElementById('units');
+    const stdTimeDisplay = document.getElementById('std-time');
+    const decTimeDisplay = document.getElementById('dec-time');
+
+    function calculateTime() {
+        const units = parseFloat(unitInput.value);
+        
+        // If the input is empty or invalid, reset the display to 0
+        if (isNaN(units) || units < 0) {
+            stdTimeDisplay.textContent = '0h 0m';
+            decTimeDisplay.textContent = '0.00';
+            return;
+        }
+
+        // Equation: 100 units = 1 hour. Therefore, 1 unit = 0.6 minutes.
+        const decimalHours = units / 100;
+        const totalMinutes = units * 0.6;
+        
+        const hours = Math.floor(totalMinutes / 60);
+        const minutes = Math.round(totalMinutes % 60);
+
+        stdTimeDisplay.textContent = `${hours}h ${minutes}m`;
+        decTimeDisplay.textContent = decimalHours.toFixed(2);
+    }
+
+    function resetApp() {
+        unitInput.value = '';
+        calculateTime();
+        unitInput.focus(); // Brings the keyboard back up automatically
+    }
+
+    // Instantly calculate whenever a number is typed
+    unitInput.addEventListener('input', calculateTime);
+</script>
+</body>
+</html>
